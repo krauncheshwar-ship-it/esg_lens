@@ -1,0 +1,22 @@
+# UI
+streamlit>=1.35.0
+
+# PDF parsing
+PyMuPDF>=1.24.0
+
+# NLP / retrieval
+rank-bm25>=0.2.2
+faiss-cpu>=1.8.0
+numpy>=1.26.0
+
+# OpenAI
+openai>=1.30.0
+
+# Config
+pyyaml>=6.0.1
+
+# Export
+openpyxl>=3.1.2
+
+# Env
+python-dotenv>=1.0.1

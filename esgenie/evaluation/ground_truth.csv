@@ -1,0 +1,11 @@
+query,expected_answer,theme,pdf_file
+What are the company's total Scope 1 greenhouse gas emissions?,The company reported Scope 1 emissions of approximately X metric tons of CO2 equivalent.,environment,
+What are the company's total Scope 2 greenhouse gas emissions?,The company reported Scope 2 emissions of approximately X metric tons of CO2 equivalent.,environment,
+What renewable energy targets has the company committed to?,The company has committed to sourcing 100% renewable electricity by 2030.,environment,
+What is the gender diversity ratio in the company's global workforce?,Women represent approximately X% of the global workforce.,social,
+What is the company's total recordable injury rate (TRIR)?,The company's TRIR was X per 200000 hours worked.,social,
+How many hours of employee training were delivered on average per employee?,Employees received an average of X hours of training per year.,social,
+What percentage of the board of directors are independent?,X% of board members are classified as independent directors.,governance,
+Does the company have an anti-corruption or anti-bribery policy?,Yes the company maintains a group-wide anti-corruption and anti-bribery policy.,governance,
+What is the CEO-to-median-worker pay ratio?,The CEO pay ratio is X:1 compared to the median employee.,governance,
+What frameworks does the company use to report its ESG data?,The company reports in alignment with GRI SASB and TCFD frameworks.,governance,
