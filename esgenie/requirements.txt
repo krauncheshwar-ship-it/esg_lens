@@ -12,6 +12,13 @@ numpy>=1.26.0
 # OpenAI
 openai>=1.30.0
 
+# LangGraph orchestration
+langgraph>=1.1.0
+langgraph-checkpoint-sqlite>=3.0.0
+
+# Data
+pandas>=2.2.0
+
 # Config
 pyyaml>=6.0.1
 
