@@ -452,11 +452,39 @@ with tab1:
                     overall = scores.get("overall_score", 0) if scores else 0
                     rating  = scores.get("overall_rating", "–") if scores else "–"
                     interp  = scores.get("overall_interpretation", "") if scores else ""
-                    st.metric(
-                        label="Overall ESG Score",
-                        value=f"{overall:.1f} / 100",
-                        delta=f"{rating} — {interp}",
-                    )
+
+                    def get_rating_color(rating):
+                        mapping = {
+                                    "AAA": "#1e7e34",  # dark green
+                                    "AA": "#28a745",
+                                    "A": "#6fbf73",
+                                    "BBB": "#f1c40f",  # yellow
+                                    "BB": "#e67e22",   # orange 
+                                    "B": "#d35400",
+                                    "CCC": "#c0392b"
+                        }
+                        return mapping.get(rating, "#6c757d")
+
+                    color = get_rating_color(rating)
+
+                    st.markdown(f"""
+                    <div style="
+                        background:#ffffff;
+                        padding:16px;
+                        border-radius:12px;
+                        border:1px solid rgba(0,0,0,0.08);
+                    ">
+                        <div style="font-size:13px; color:#6b7280;">
+                            Overall ESG Score
+                        </div>
+                        <div style="font-size:28px; font-weight:700;">
+                            {overall:.1f} / 100
+                        </div>
+                        <div style="color:{color}; font-weight:600; font-size:14px;">
+                            {rating} — {interp}
+                        </div>
+                        </div>
+                    """, unsafe_allow_html=True)
                     st.caption("First extraction — no prior year comparison available")
 
                 # B) Sector-adjusted table
