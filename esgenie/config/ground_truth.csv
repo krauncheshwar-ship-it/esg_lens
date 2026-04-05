@@ -1,0 +1,59 @@
+company,report_year,kpi_id,kpi_canonical_name,expected_value,expected_unit,source_page,value_type,notes
+Nike,2024,C001,Scope 1 Emissions,57390,tCO2e,23,numeric,SBT Footprint table p.23
+Nike,2023,C001,Scope 1 Emissions,59672,tCO2e,23,numeric,Historical - batch 2
+Nike,2022,C001,Scope 1 Emissions,64636,tCO2e,23,numeric,Historical - batch 2
+Nike,2021,C001,Scope 1 Emissions,59530,tCO2e,23,numeric,Historical - batch 2
+Nike,2020,C001,Scope 1 Emissions,64804,tCO2e,23,numeric,Historical - batch 2
+Nike,2019,C001,Scope 1 Emissions,46713,tCO2e,23,numeric,Historical base year - batch 2
+Nike,2024,C002,Scope 2 Emissions (Market-Based),12120,tCO2e,23,numeric,94% reduction since FY2019
+Nike,2023,C002,Scope 2 Emissions (Market-Based),11051,tCO2e,23,numeric,Historical - batch 2
+Nike,2022,C002,Scope 2 Emissions (Market-Based),22944,tCO2e,23,numeric,Historical - batch 2
+Nike,2021,C002,Scope 2 Emissions (Market-Based),76420,tCO2e,23,numeric,Historical - batch 2
+Nike,2020,C002,Scope 2 Emissions (Market-Based),160840,tCO2e,23,numeric,Historical - batch 2
+Nike,2019,C002,Scope 2 Emissions (Market-Based),209065,tCO2e,23,numeric,Peak before renewable shift - batch 2
+Nike,2024,C003,Scope 3 Emissions Total,8196965,tCO2e,23,numeric,Confirmed batch 2 row 15
+Nike,2024,C004,Scope 3 Cat 1 - Purchased Goods,6952112,tCO2e,25,numeric,84% of total Scope 3
+Nike,2024,C005,Scope 3 Cat 4 - Upstream Transport,552710,tCO2e,25,numeric,Inbound freight
+Nike,2024,C006,Scope 3 Cat 12 - End of Life,511400,tCO2e,25,numeric,Product and packaging disposal
+Nike,2024,C007,Scope 3 Cat 9 - Downstream Transport,54444,tCO2e,25,numeric,Distribution to retail/consumer
+Nike,2024,C008,Scope 3 Cat 7 - Employee Commuting,72625,tCO2e,25,numeric,Estimated via commuting survey
+Nike,2024,C009,Scope 3 Cat 6 - Business Travel,39928,tCO2e,25,numeric,Commercial air travel only
+Nike,2024,C010,Scope 3 Cat 3 - Fuel & Energy,11984,tCO2e,25,numeric,Upstream energy activities
+Nike,2024,C011,Scope 3 Cat 5 - Waste in Operations,1761,tCO2e,25,numeric,Waste from landfill at owned facilities
+Nike,2024,C012,Emissions Target Active,Yes,yes/no,5,boolean,Multiple active GHG targets FY24
+Nike,2024,C013,Science-Based Target Exists,Yes,yes/no,23,boolean,SBT confirmed p.23-24
+Nike,2024,C014,Emissions Reduction Progress vs Target,MEDIUM,H/M/L,12,subjective,S1+2 exceeded (HIGH) Scope3 37% (LOW) = MEDIUM
+Nike,2024,C015,Renewable Energy Percentage,96,%,12,numeric,96% renewable electricity owned/operated FY24
+Nike,2024,C017,Total GHG Emissions All Scopes,8266475,tCO2e,23,numeric,Computed: 57390+12120+8196965
+Nike,2024,C018,GHG Base Year Total (FY2015),9483677,tCO2e,23,numeric,35624+228770+9219283 batch 2 row 12
+Nike,2024,C019,1.5°C Target Alignment,Yes,yes/no,5,boolean,SBTi 1.5C aligned confirmed
+Nike,2024,C020,Emissions Target Achievement Status,MEDIUM,H/M/L,12,subjective,S1+2 Achieved. S3 In Progress at 37% of target.
+Nike,2024,F006,Raw Material Traceability (Leather),Yes,yes/no,5,boolean,Batch 3 row 24. Nike requires traceable leather from suppliers.
+Nike,2024,F007,Timber/Fibre Traceability,LOW,H/M/L,5,subjective,Batch 3 row 30. Certification-based only. No detailed timber metrics.
+Nike,2024,P001,Plastics Reduction Target,MEDIUM,H/M/L,5,subjective,Batch 3 row 31. Indirect targets only. Not a formal plastics commitment.
+Nike,2024,W003,Wastewater Discharged / ZDHC Compliance,90,%,45,numeric,90%+ strategic suppliers met ZDHC guidelines FY24. Batch 3 row 40.
+Nike,2024,W005,Board-Level Environmental Oversight,Yes,yes/no,3,boolean,Confirmed batch 3 rows 32-35. All 4 topics Yes. p.3 + p.40 GRI 2-12.
+Nike,2024,W006,Water Restoration Target,Yes,yes/no,6,boolean,13B liter restoration target by FY25. Batch 3 row 36.
+Nike,2024,W007,Cleaner Chemistry / ZDHC Target,Yes,yes/no,3,boolean,10 priority chemistries target. Batch 3 row 37.
+Nike,2024,W008,WASH Target,No,yes/no,AWAITING,boolean,No formal numeric WASH target disclosed. Batch 3 row 38.
+Nike,2024,W009,Freshwater Reduction Target,Yes,yes/no,4,boolean,25% reduction per kg textile dyeing/finishing. Batch 3 row 39.
+Nike,2024,W010,Water Target Progress vs Goal,HIGH,H/M/L,45,subjective,15% reduction achieved (60% of target) + 90%+ ZDHC = HIGH. Batch 3 row 40.
+Nike,2024,W011,Freshwater Intensity (FY24 Reported),71.4,L/kg,6,numeric,CORRECTED batch 4 row 14. Directly reported value. Previous computed estimate 71.7 was wrong.
+Nike,2020,W012,Freshwater Intensity Base Year (FY20),84.4,L/kg,6,numeric,FY20 base. Batch 3 row 41. p.6.
+Nike,2020,W013,Water Restoration Base Year (FY20),0.7,billion_liters,6,numeric,FY20 base restored. Target 13B by FY25. Batch 3 row 41.
+Nike,2024,C021,Scope 2 Emissions Location-Based,211322,tCO2e,17,numeric,NEW batch 4 row 78. Delta vs market-based = 199202 tCO2e avoided via renewables.
+Nike,2024,W014,Water Restored FY24,6.9,billion_liters,6,numeric,NEW batch 4 row 14. Directly reported. 53% of 13B liter target achieved.
+Nike,2024,F002,No-Deforestation Policy Exists,Yes,yes/no,5,boolean,UPDATED batch 4 row 64. Formal DCF policy confirmed. Was incorrectly Not Disclosed.
+Nike,2024,F003,Deforestation Programme Active,Yes,yes/no,5,boolean,UPDATED batch 4 row 65. Active programme via traceability and certification.
+Nike,2024,F005,Sustainable Commodity Sourcing,HIGH,H/M/L,5,subjective,UPGRADED batch 4. Formal policy + FSC certs + active programmes = HIGH.
+Nike,2024,F008,Forest Certifications (FSC/SFI/PEFC),Yes,yes/no,6,boolean,NEW batch 4 row 55+63. FSC/SFI/PEFC for packaging confirmed.
+Nike,2024,F009,Sustainable Agriculture Programme,Yes,yes/no,5,boolean,NEW batch 4 row 61. Cotton and raw materials sustainable agriculture.
+Nike,2024,F010,Biodiversity Programme,Yes,yes/no,5,boolean,NEW batch 4 row 47. Biodiversity/ecosystem programmes confirmed.
+Nike,2024,E001,Hazardous Waste Generated (Manufacturing),15206,MT,29,numeric,NEW batch 4 row 101. Hazardous Waste Generated in Manufacturing.
+Nike,2024,W015,Water Target Supplier Coverage,80,%,6,numeric,NEW batch 4 row 9. ~80% supplier coverage for freshwater reduction target. Source p.6.
+Nike,2024,W016,Water Management Policy,Yes,yes/no,38,boolean,Sheet6 row 8. Formal water policy confirmed p.38.
+Nike,2024,C022,Internal Carbon Price,No,yes/no,AWAITING,boolean,Sheet6 rows 38-39. No internal carbon price disclosed. Negative signal.
+Nike,2024,F011,Animal Welfare Policy,Yes,yes/no,5,boolean,Sheet6 rows 43-44. Animal welfare in raw materials standards p.3-5.
+Nike,2024,G009,Environmental Policy,Yes,yes/no,5,boolean,Sheet6 row 56. Environmental policy via sustainability commitments p.3-5.
+Nike,2024,CONT001,Environmental Controversy Score (Supply Chain),MODERATE,NONE/MILD/MODERATE/SEVERE,AWAITING,subjective,Sheet6 rows 64+67-69. Supply chain pollution historical+partially remediated. Deduction: -8 pts.
+Nike,2024,CONT002,Environmental Controversy Score (Products),MODERATE,NONE/MILD/MODERATE/SEVERE,AWAITING,subjective,Sheet6 row 65. Greenwashing on Move to Zero. Deduction: -5 pts.

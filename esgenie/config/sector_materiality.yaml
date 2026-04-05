@@ -1,0 +1,35 @@
+# Sector materiality weights for ESG scoring
+# Drives exposure_relevance in esg_scorer.py
+# Weights per theme must sum to 1.0 per sector
+# Default sector for Nike: apparel_consumer
+
+sectors:
+  apparel_consumer:
+    climate: 0.35
+    governance: 0.30
+    employee: 0.25
+    water: 0.10
+
+  energy:
+    climate: 0.40
+    governance: 0.25
+    employee: 0.20
+    water: 0.15
+
+  financial_services:
+    governance: 0.45
+    climate: 0.25
+    employee: 0.20
+    water: 0.10
+
+  utilities:
+    climate: 0.35
+    water: 0.30
+    governance: 0.20
+    employee: 0.15
+
+  technology:
+    governance: 0.40
+    employee: 0.30
+    climate: 0.20
+    water: 0.10

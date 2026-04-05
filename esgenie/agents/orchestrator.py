@@ -1,111 +1,144 @@
 """
 orchestrator.py
-Central controller that wires together ingestion, processing, retrieval,
-and extraction agents.  Exposes two public modes:
-
-  Mode 1 — ad-hoc Q&A:    orchestrator.ask(pdf_path, query)
-  Mode 2 — full ESG sweep: orchestrator.sweep(pdf_path)
+Mode 1 single-query coordinator. Wires router -> retrieval -> extraction.
+Mode 2 (full profile) is handled by profile_graph.py (LangGraph).
 """
 
-import os
-from pathlib import Path
+import time
+from datetime import datetime
 
-from ingestion.pdf_parser import extract_pages
-from processing.thematic_bucketer import score_pages
-from processing.chunker import chunk_pages
-from retrieval.embedder import build_faiss_index, load_faiss_index
-from retrieval.hybrid_retriever import HybridRetriever
 from agents.query_router import route_query
-from agents.extraction_agent import extract, batch_extract
+from retrieval.hybrid_retriever import hybrid_search
+from agents.extraction_agent import extract
+from utils.token_tracker import get_session_summary
 
-# Default sweep questions covering all three ESG pillars
-_DEFAULT_SWEEP_QUERIES = [
-    # Environment
-    "What are the company's total Scope 1, Scope 2, and Scope 3 greenhouse gas emissions?",
-    "What renewable energy targets or commitments has the company made?",
-    "How does the company manage water consumption and withdrawal?",
-    "What waste reduction or recycling programs does the company operate?",
-    # Social
-    "What is the gender diversity breakdown in the company's workforce and leadership?",
-    "What is the company's total recordable injury rate (TRIR) or safety performance?",
-    "What employee training and development programs does the company offer?",
-    "How does the company address human rights in its supply chain?",
-    # Governance
-    "What is the composition and independence of the board of directors?",
-    "How is executive compensation structured and linked to ESG performance?",
-    "What anti-corruption policies and whistleblower mechanisms are in place?",
-    "What cybersecurity governance frameworks does the company follow?",
-]
+# Logger imports are optional — modules created later in build sequence
+try:
+    from logging_system.system_logger import log_event as _log_event
+except ImportError:
+    _log_event = None
+
+try:
+    from logging_system.ai_metrics_logger import log_metrics as _log_metrics
+except ImportError:
+    _log_metrics = None
 
 
-def _get_index_name(pdf_path: str) -> str:
-    return Path(pdf_path).stem.replace(" ", "_")
-
-
-def _build_retriever(pdf_path: str) -> HybridRetriever:
+def run_single_query(
+    query: str,
+    faiss_index,
+    chunks: list[dict],
+    bm25_index,
+    company: str,
+    year: int,
+    kpi_id: str = "",
+    value_type: str = "numeric",
+    unit_expected: str = "",
+    bm25_disabled: bool = False,
+) -> dict:
     """
-    Ingest and index a PDF, using the FAISS cache when available.
+    Execute a single ESG extraction query end-to-end (Mode 1).
 
-    Returns a ready-to-query HybridRetriever.
-    """
-    index_name = _get_index_name(pdf_path)
-    cached = load_faiss_index(index_name)
-
-    if cached is not None:
-        faiss_index, chunks = cached
-    else:
-        pages = extract_pages(pdf_path)
-        pages = score_pages(pages)
-        chunks = chunk_pages(pages)
-        faiss_index, chunks = build_faiss_index(chunks, index_name)
-
-    return HybridRetriever(faiss_index, chunks)
-
-
-# ---------------------------------------------------------------------------
-# Public API
-# ---------------------------------------------------------------------------
-
-def ask(pdf_path: str, query: str, top_k: int = 10) -> dict:
-    """
-    Mode 1 — Answer a single ad-hoc question about an ESG report.
+    Steps: route -> hybrid_search -> extract -> log
 
     Args:
-        pdf_path: Path to the ESG PDF.
-        query:    User question.
-        top_k:    Number of context chunks to retrieve.
+        query:         User question.
+        faiss_index:   Built FAISS index.
+        chunks:        Chunk metadata aligned with index.
+        bm25_index:    BM25Okapi index.
+        company:       Company name for prompt context.
+        year:          Reporting year.
+        kpi_id:        KPI identifier (e.g. "C001").
+        value_type:    "numeric" | "boolean" | "subjective".
+        unit_expected: Expected unit hint.
+        bm25_disabled: Pass-through to hybrid_search for demo comparison.
 
     Returns:
-        Extraction result dict (see extraction_agent.extract).
-        Also includes "route" key with theme classification.
+        Combined result dict with extraction, retrieval metadata, and timings.
     """
-    retriever = _build_retriever(pdf_path)
+    run_id = f"q_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
+    t_start = time.time()
+
+    # 1. Log start
+    if _log_event:
+        _log_event(run_id=run_id, event="query_start", module="agents/orchestrator.py",
+                   company=company, status="running", error=None,
+                   extra={"query": query, "kpi_id": kpi_id})
+
+    # 2. Route query → theme
     route = route_query(query)
-    chunks = retriever.retrieve(query, top_k=top_k)
-    result = extract(query, chunks)
-    result["route"] = route
-    return result
+    theme = route["theme"]
 
+    # 3. Hybrid retrieval — theme-filtered, top 5 for LLM context
+    t_retrieval = time.time()
+    retrieval_results = hybrid_search(
+        query=query,
+        faiss_index=faiss_index,
+        chunks=chunks,
+        bm25_index=bm25_index,
+        k=5,
+        theme_filter=theme,
+        bm25_disabled=bm25_disabled,
+    )
+    retrieval_ms = (time.time() - t_retrieval) * 1000
 
-def sweep(
-    pdf_path: str,
-    queries: list[str] | None = None,
-    top_k: int = 10,
-) -> list[dict]:
-    """
-    Mode 2 — Run a predefined set of ESG questions against a report.
+    top_chunks = [r["chunk"] for r in retrieval_results]
+    top_rrf_score = retrieval_results[0]["rrf_score"] if retrieval_results else 0.0
+    top_page = top_chunks[0]["page_number"] if top_chunks else None
 
-    Args:
-        pdf_path: Path to the ESG PDF.
-        queries:  Custom question list (defaults to _DEFAULT_SWEEP_QUERIES).
-        top_k:    Chunks per query.
+    # 4. LLM extraction — ONE call on pre-filtered context
+    t_extraction = time.time()
+    extraction = extract(
+        query=query,
+        chunks=top_chunks,
+        kpi_id=kpi_id,
+        value_type=value_type,
+        unit_expected=unit_expected,
+        company=company,
+        year=year,
+    )
+    extraction_ms = (time.time() - t_extraction) * 1000
 
-    Returns:
-        List of extraction result dicts, one per query.
-    """
-    if queries is None:
-        queries = _DEFAULT_SWEEP_QUERIES
+    # 5. Hallucination flag already set in extraction_agent; surface here too
+    hallucination_flag = extraction.get("hallucination_flag", 0)
 
-    retriever = _build_retriever(pdf_path)
-    results = batch_extract(queries, retriever, top_k=top_k)
-    return results
+    # 6. Log AI metrics
+    if _log_metrics:
+        _log_metrics(
+            run_id=run_id,
+            query=query,
+            theme_classified=theme,
+            chunks_retrieved=len(top_chunks),
+            top_chunk_page=top_page,
+            top_chunk_score_rrf=top_rrf_score,
+            extraction_confidence=extraction.get("confidence", "not_found"),
+            value_found=extraction.get("value") is not None,
+            hallucination_flag=bool(hallucination_flag),
+            latency_retrieval_ms=round(retrieval_ms),
+            latency_extraction_ms=round(extraction_ms),
+        )
+
+    total_ms = (time.time() - t_start) * 1000
+    session = get_session_summary()
+
+    # 7. Log completion
+    if _log_event:
+        _log_event(run_id=run_id, event="query_complete", module="agents/orchestrator.py",
+                   company=company, status="success", error=None,
+                   extra={"latency_ms": round(total_ms), "cost_usd": session["total_cost_usd"]})
+
+    return {
+        **extraction,
+        "run_id": run_id,
+        "theme": theme,
+        "route_confidence": route["confidence"],
+        "matched_keywords": route["matched_keywords"],
+        "retrieval_results": retrieval_results,
+        "top_chunk_page": top_page,
+        "top_rrf_score": top_rrf_score,
+        "hallucination_flag": hallucination_flag,
+        "latency_retrieval_ms": round(retrieval_ms),
+        "latency_extraction_ms": round(extraction_ms),
+        "total_latency_ms": round(total_ms),
+        "total_cost_usd": session["total_cost_usd"],
+    }

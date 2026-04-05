@@ -1,70 +1,102 @@
 """
 query_router.py
-Classifies an incoming query into one or more ESG themes using GPT-4o-mini.
+Deterministic ESG theme classifier — NO LLM calls.
+Routes queries by keyword matching against YAML page_bucketing_keywords.
+
+Rationale (video line 2): "The router is rules-based, not LLM-based, because
+routing by theme is a deterministic operation — using an LLM here would add
+cost and latency for zero benefit."
 """
 
-import json
-import os
-from openai import OpenAI
-from utils.token_tracker import track_llm_call
+import yaml
+from pathlib import Path
 
-_ROUTER_MODEL = "gpt-4o-mini"
-_VALID_THEMES = {"environment", "social", "governance", "general"}
+_YAML_PATH = Path(__file__).parent.parent / "config" / "esg_themes_v3_FINAL.yaml"
 
-_SYSTEM_PROMPT = """You are an ESG (Environmental, Social, Governance) query classifier.
+# Priority order for tie-breaking
+_THEME_PRIORITY = ["governance", "climate", "employee", "water", "biodiversity", "waste"]
 
-Given a user query, return a JSON object with:
-  - "themes": a list of relevant ESG themes from ["environment", "social", "governance"].
-              Use "general" if the query spans all themes or is not theme-specific.
-  - "rationale": one sentence explaining the classification.
+# Lazy-loaded keyword map
+_KEYWORD_MAP: dict[str, str] | None = None
 
-Always return valid JSON. Example:
-{"themes": ["environment", "social"], "rationale": "The query mentions both carbon emissions and workforce diversity."}
-"""
+
+def _load_keyword_map() -> dict[str, str]:
+    """Build flat {keyword_lower: theme} map from YAML page_bucketing_keywords."""
+    global _KEYWORD_MAP
+    if _KEYWORD_MAP is not None:
+        return _KEYWORD_MAP
+
+    with open(_YAML_PATH, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+
+    mapping: dict[str, str] = {}
+    for theme, meta in data["themes"].items():
+        for kw in meta.get("page_bucketing_keywords", []):
+            mapping[str(kw).lower()] = theme
+
+    _KEYWORD_MAP = mapping
+    return _KEYWORD_MAP
+
+
+def _detect_query_type(query_lower: str) -> str:
+    """Classify query intent from surface-level keywords."""
+    if any(w in query_lower for w in ("full", "all", "profile", "company")):
+        return "full_profile"
+    if any(w in query_lower for w in ("does", "is there", "do they", "have")):
+        return "boolean"
+    if any(w in query_lower for w in ("progress", "target", "achievement", "plan")):
+        return "subjective"
+    return "single_metric"
 
 
 def route_query(query: str) -> dict:
     """
-    Classify a user query into ESG themes.
+    Route a query to the most relevant ESG theme via deterministic keyword matching.
 
     Args:
-        query: The raw user question.
+        query: Raw user question.
 
     Returns:
-        Dict with keys:
-            "themes":    list[str]  — subset of {"environment","social","governance","general"}
-            "rationale": str        — short explanation
+        {
+            "theme":            str,       # winning theme
+            "confidence":       str,       # "high" | "medium" | "low"
+            "matched_keywords": list[str], # keywords that matched
+            "query_type":       str,       # "single_metric" | "full_profile" | "boolean" | "subjective"
+        }
     """
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    keyword_map = _load_keyword_map()
+    query_lower = query.lower()
 
-    messages = [
-        {"role": "system", "content": _SYSTEM_PROMPT},
-        {"role": "user", "content": query},
-    ]
+    # Count matches per theme and collect matched keywords
+    theme_hits: dict[str, list[str]] = {}
+    for kw, theme in keyword_map.items():
+        if kw in query_lower:
+            theme_hits.setdefault(theme, []).append(kw)
 
-    response = client.chat.completions.create(
-        model=_ROUTER_MODEL,
-        messages=messages,
-        temperature=0,
-        response_format={"type": "json_object"},
+    if not theme_hits:
+        print(f"Routed to theme 'climate' (confidence: low, matched: 0 keywords)")
+        return {
+            "theme": "climate",
+            "confidence": "low",
+            "matched_keywords": [],
+            "query_type": _detect_query_type(query_lower),
+        }
+
+    # Sort themes by hit count, then by priority order for ties
+    best_theme = max(
+        theme_hits,
+        key=lambda t: (len(theme_hits[t]), -_THEME_PRIORITY.index(t) if t in _THEME_PRIORITY else -99),
     )
 
-    track_llm_call(
-        model=_ROUTER_MODEL,
-        prompt_tokens=response.usage.prompt_tokens,
-        completion_tokens=response.usage.completion_tokens,
-        call_type="query_router",
-    )
+    matched = theme_hits[best_theme]
+    n = len(matched)
+    confidence = "high" if n >= 3 else "medium" if n >= 1 else "low"
 
-    raw = response.choices[0].message.content
-    result = json.loads(raw)
-
-    # Sanitize themes to known values
-    themes = [t for t in result.get("themes", ["general"]) if t in _VALID_THEMES]
-    if not themes:
-        themes = ["general"]
+    print(f"Routed to theme '{best_theme}' (confidence: {confidence}, matched: {n} keywords)")
 
     return {
-        "themes": themes,
-        "rationale": result.get("rationale", ""),
+        "theme": best_theme,
+        "confidence": confidence,
+        "matched_keywords": matched,
+        "query_type": _detect_query_type(query_lower),
     }

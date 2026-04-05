@@ -1,135 +1,75 @@
 """
 chunker.py
-Paragraph-aware text chunking with rich metadata.
-Each chunk carries: text, source, page_num, chunk_id, theme_scores, top_theme.
+Paragraph-aware chunking of BM25-bucketed PDF pages.
+Each chunk carries theme, page, company, and year metadata for retrieval.
 """
 
 import re
-import hashlib
 
 
-def _split_paragraphs(text: str) -> list[str]:
-    """Split on blank lines; collapse internal whitespace within each paragraph."""
-    raw = re.split(r"\n\s*\n", text)
-    paragraphs = []
-    for para in raw:
-        cleaned = " ".join(para.split())
-        if cleaned:
-            paragraphs.append(cleaned)
-    return paragraphs
-
-
-def _chunk_id(source: str, page_num: int, idx: int) -> str:
-    key = f"{source}::{page_num}::{idx}"
-    return hashlib.md5(key.encode()).hexdigest()[:12]
-
-
-def chunk_pages(
-    pages: list[dict],
-    max_chars: int = 1500,
-    overlap_chars: int = 150,
+def chunk_bucketed_pages(
+    page_corpus: dict[int, str],
+    thematic_page_map: dict[str, list[int]],
+    company: str = "",
+    report_year: int = 2024,
+    min_chunk_chars: int = 80,
 ) -> list[dict]:
     """
-    Convert a list of page dicts into smaller, overlapping chunks.
-
-    Strategy:
-      1. Split each page into paragraphs.
-      2. Greedily accumulate paragraphs until max_chars is reached.
-      3. When a single paragraph exceeds max_chars, split it by sentence.
-      4. Carry overlap_chars from the previous chunk into the next.
+    Split bucketed pages into paragraph chunks with rich metadata.
 
     Args:
-        pages:         Output from pdf_parser (optionally scored by thematic_bucketer).
-        max_chars:     Target maximum characters per chunk.
-        overlap_chars: Characters of overlap between consecutive chunks.
+        page_corpus:       {page_number (1-indexed): page_text}
+        thematic_page_map: {theme: [page_numbers]} from ThematicBucketer.bucket()
+        company:           Company name tag added to every chunk.
+        report_year:       Reporting year tag added to every chunk.
+        min_chunk_chars:   Minimum character length; shorter paragraphs are dropped.
 
     Returns:
         List of chunk dicts:
             {
-                "chunk_id":     str,
-                "source":       str,
-                "page_num":     int,
-                "text":         str,
-                "char_count":   int,
-                "theme_scores": dict | None,
-                "top_theme":    str | None,
+                "chunk_id":   str,   # "{theme}_p{page}_c{idx}"
+                "text":       str,
+                "page_number": int,
+                "theme":      str,
+                "company":    str,
+                "report_year": int,
+                "char_count": int,
             }
     """
-    chunks = []
+    chunks: list[dict] = []
+    unique_pages: set[int] = set()
 
-    for page in pages:
-        source = page.get("source", "unknown")
-        page_num = page.get("page_num", 0)
-        theme_scores = page.get("theme_scores")
-        top_theme = page.get("top_theme")
+    for theme, page_numbers in thematic_page_map.items():
+        for page_num in page_numbers:
+            unique_pages.add(page_num)
+            page_text = page_corpus.get(page_num, "")
+            if not page_text:
+                continue
 
-        paragraphs = _split_paragraphs(page["text"])
-        buffer = ""
-        chunk_idx = 0
+            paragraphs = page_text.split("\n\n")
+            chunk_idx = 0
 
-        for para in paragraphs:
-            # If the paragraph alone exceeds max_chars, split by sentence
-            if len(para) > max_chars:
-                sentences = re.split(r"(?<=[.!?])\s+", para)
-                for sent in sentences:
-                    if len(buffer) + len(sent) + 1 <= max_chars:
-                        buffer = (buffer + " " + sent).strip()
-                    else:
-                        if buffer:
-                            chunks.append(
-                                _make_chunk(
-                                    buffer, source, page_num, chunk_idx,
-                                    theme_scores, top_theme
-                                )
-                            )
-                            chunk_idx += 1
-                            buffer = buffer[-overlap_chars:] + " " + sent
-                            buffer = buffer.strip()
-                        else:
-                            buffer = sent
-            else:
-                if len(buffer) + len(para) + 1 <= max_chars:
-                    buffer = (buffer + " " + para).strip()
-                else:
-                    if buffer:
-                        chunks.append(
-                            _make_chunk(
-                                buffer, source, page_num, chunk_idx,
-                                theme_scores, top_theme
-                            )
-                        )
-                        chunk_idx += 1
-                        buffer = buffer[-overlap_chars:] + " " + para
-                        buffer = buffer.strip()
-                    else:
-                        buffer = para
+            for para in paragraphs:
+                # Collapse internal whitespace
+                cleaned = " ".join(para.split())
+                if len(cleaned) < min_chunk_chars:
+                    continue
 
-        # Flush remaining buffer
-        if buffer:
-            chunks.append(
-                _make_chunk(
-                    buffer, source, page_num, chunk_idx,
-                    theme_scores, top_theme
+                chunks.append(
+                    {
+                        "chunk_id": f"{theme}_p{page_num}_c{chunk_idx}",
+                        "text": cleaned,
+                        "page_number": page_num,
+                        "theme": theme,
+                        "company": company,
+                        "report_year": report_year,
+                        "char_count": len(cleaned),
+                    }
                 )
-            )
+                chunk_idx += 1
 
+    print(
+        f"Created {len(chunks)} chunks from {len(unique_pages)} unique pages "
+        f"across {len(thematic_page_map)} themes"
+    )
     return chunks
-
-
-def _make_chunk(
-    text: str,
-    source: str,
-    page_num: int,
-    chunk_idx: int,
-    theme_scores: dict | None,
-    top_theme: str | None,
-) -> dict:
-    return {
-        "chunk_id": _chunk_id(source, page_num, chunk_idx),
-        "source": source,
-        "page_num": page_num,
-        "text": text,
-        "char_count": len(text),
-        "theme_scores": theme_scores,
-        "top_theme": top_theme,
-    }

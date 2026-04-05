@@ -1,0 +1,1663 @@
+# ============================================================
+# ESGenie — ESG Themes YAML Dictionary (v3 FINAL)
+# ============================================================
+# Purpose: Two-tier keyword structure for BM25 thematic pipeline
+#
+# TIER 1 — page_bucketing_keywords
+#   Broad keyword list fed to BM25 to identify top 5 pages per
+#   theme before any LLM call. Recall-optimized — catch every
+#   page where a relevant KPI might appear.
+#
+# TIER 2 — kpi_keywords
+#   Per-KPI precision terms for hybrid retrieval within bucketed
+#   pages. Precision-optimized — maximize correct chunk ranking.
+#   Includes: terms (BM25 search), units (value validation),
+#   value_type (extraction agent instruction)
+#
+# Pipeline flow:
+#   PDF pages → TIER 1 BM25 → top 5 pages per theme
+#   → TIER 2 BM25 + semantic → top chunks per KPI
+#   → LLM extraction (once, on smallest possible context)
+#
+# Coverage: 88 KPIs | 6 themes
+# Standards: GRI 2/201/205/303/305/401-405/408/413-414/418
+#            SASB Apparel CG-AA-310/430 | TCFD | TNFD | SBTi | FSC
+# Version: v3 FINAL — all themes complete
+# ============================================================
+
+themes:
+
+  # ──────────────────────────────────────────────────────────
+  # CLIMATE — 22 KPIs (C001-C022)
+  # ──────────────────────────────────────────────────────────
+  climate:
+    description: "GHG emissions across Scope 1/2/3, energy use, climate targets, carbon reduction"
+
+    page_bucketing_keywords:
+      # Emission scopes — primary identifiers
+      - scope 1
+      - scope 2
+      - scope 3
+      - greenhouse gas
+      - GHG
+      - tCO2e
+      - MtCO2e
+      - metric tons CO2
+      - carbon dioxide equivalent
+      - CO2e
+      - direct emissions
+      - indirect emissions
+      - market-based emissions
+      - location-based emissions
+      - gross global emissions
+      # Totals
+      - total emissions
+      - combined emissions
+      - all scopes
+      - absolute emissions
+      # Targets and commitments
+      - science-based target
+      - SBT
+      - SBTi
+      - net zero
+      - carbon neutral
+      - emissions target
+      - baseline year
+      - reduction target
+      - emissions reduction
+      - target achieved
+      - 1.5 degree
+      - Paris aligned
+      - FY15
+      - FY20
+      - FY25
+      - FY30
+      # Energy
+      - renewable electricity
+      - renewable energy
+      - clean energy
+      - energy consumption
+      - gigajoules
+      - energy intensity
+      - owned or operated facilities
+      # Scope 3 categories
+      - purchased goods
+      - upstream transportation
+      - downstream transportation
+      - business travel
+      - employee commuting
+      - end of life treatment
+      - waste generated in operations
+      - fuel and energy related
+      - supply chain emissions
+      - value chain emissions
+      # Carbon pricing
+      - internal carbon price
+      - shadow carbon price
+      - carbon pricing mechanism
+      # Base year and historical
+      - base year
+      - FY2015
+      - baseline emissions
+      - historical emissions
+      # Reporting frameworks
+      - GRI 305
+      - GRI 302
+      - TCFD
+      - SBT Footprint
+      - Environmentally Preferred Materials
+      - EPM
+
+    kpi_keywords:
+      C001:
+        name: "Scope 1 Emissions"
+        terms:
+          - scope 1
+          - direct emissions
+          - gross scope 1
+          - owned facility emissions
+          - operational GHG
+          - scope 1 GHG
+          - direct GHG
+          - owned operated emissions
+          - facilities direct
+        units: ["tCO2e", "metric tons CO2e", "MtCO2e", "metric tons CO2"]
+        value_type: numeric
+        page_hint: 23
+
+      C002:
+        name: "Scope 2 Emissions (Market-Based)"
+        terms:
+          - scope 2 market-based
+          - market-based emissions
+          - scope 2 market
+          - energy indirect market
+          - purchased electricity market
+          - renewable energy certificates
+          - scope 2 mb
+        units: ["tCO2e", "metric tons CO2e"]
+        value_type: numeric
+        page_hint: 23
+
+      C003:
+        name: "Scope 3 Emissions Total"
+        terms:
+          - scope 3 total
+          - total scope 3
+          - all scope 3
+          - value chain total
+          - supply chain emissions total
+          - scope 3 combined
+          - total indirect
+        units: ["tCO2e", "metric tons CO2e"]
+        value_type: numeric
+        page_hint: 23
+
+      C004:
+        name: "Scope 3 Cat 1 - Purchased Goods"
+        terms:
+          - category 1
+          - cat 1 scope 3
+          - purchased goods services
+          - materials emissions
+          - upstream supply chain emissions
+          - raw materials GHG
+          - manufacturing supply chain
+        units: ["tCO2e", "metric tons CO2e"]
+        value_type: numeric
+        page_hint: 25
+
+      C005:
+        name: "Scope 3 Cat 4 - Upstream Transport"
+        terms:
+          - category 4
+          - upstream transportation
+          - inbound logistics
+          - freight emissions upstream
+          - upstream distribution
+          - upstream T&D
+        units: ["tCO2e", "metric tons CO2e"]
+        value_type: numeric
+        page_hint: 25
+
+      C006:
+        name: "Scope 3 Cat 12 - End of Life"
+        terms:
+          - category 12
+          - end of life treatment
+          - product disposal
+          - end-of-life
+          - sold products disposal
+          - packaging end of life
+        units: ["tCO2e", "metric tons CO2e"]
+        value_type: numeric
+        page_hint: 25
+
+      C007:
+        name: "Scope 3 Cat 9 - Downstream Transport"
+        terms:
+          - category 9
+          - downstream transportation
+          - downstream T&D
+          - outbound logistics
+          - distribution center to retail
+          - downstream distribution
+        units: ["tCO2e", "metric tons CO2e"]
+        value_type: numeric
+        page_hint: 25
+
+      C008:
+        name: "Scope 3 Cat 7 - Employee Commuting"
+        terms:
+          - category 7
+          - employee commuting
+          - commute emissions
+          - staff travel
+          - employee travel to work
+          - commuting GHG
+        units: ["tCO2e", "metric tons CO2e"]
+        value_type: numeric
+        page_hint: 25
+
+      C009:
+        name: "Scope 3 Cat 6 - Business Travel"
+        terms:
+          - category 6
+          - business travel
+          - corporate travel
+          - air travel emissions
+          - flight emissions
+          - contracted travel
+          - commercial air travel
+        units: ["tCO2e", "metric tons CO2e"]
+        value_type: numeric
+        page_hint: 25
+
+      C010:
+        name: "Scope 3 Cat 3 - Fuel & Energy"
+        terms:
+          - category 3
+          - fuel and energy related
+          - upstream energy
+          - fuel energy activities
+          - energy-related activities not scope
+        units: ["tCO2e", "metric tons CO2e"]
+        value_type: numeric
+        page_hint: 25
+
+      C011:
+        name: "Scope 3 Cat 5 - Waste in Operations"
+        terms:
+          - category 5
+          - waste generated in operations
+          - operational waste emissions
+          - waste GHG
+          - landfill waste emissions
+        units: ["tCO2e", "metric tons CO2e"]
+        value_type: numeric
+        page_hint: 25
+
+      C012:
+        name: "Emissions Target Active"
+        terms:
+          - emissions target
+          - GHG target
+          - carbon target
+          - active reduction target
+          - climate commitment
+          - absolute target
+          - target active reporting year
+        value_type: boolean
+        page_hint: 5
+
+      C013:
+        name: "Science-Based Target Exists"
+        terms:
+          - science-based target
+          - SBT
+          - SBTi
+          - science based targets initiative
+          - SBT validated
+          - 1.5C aligned target
+          - Paris Agreement aligned
+        value_type: boolean
+        page_hint: 23
+
+      C014:
+        name: "Emissions Reduction Progress vs Target"
+        terms:
+          - target achieved
+          - percent of target
+          - reduction progress
+          - vs baseline
+          - reduction achieved
+          - against target
+          - ahead of schedule
+          - in progress
+          - 114 percent
+          - 37 percent
+        value_type: subjective
+        scoring_scale: "HIGH=exceeded, MEDIUM=on track, LOW=lagging"
+        page_hint: 12
+
+      C015:
+        name: "Renewable Energy Percentage"
+        terms:
+          - renewable electricity
+          - renewable energy percent
+          - clean energy percent
+          - 100 percent renewable
+          - renewable power
+          - renewable energy facilities
+          - solar wind share
+        units: ["%", "percent"]
+        value_type: numeric
+        page_hint: 12
+
+      C016:
+        name: "Total Energy Consumption"
+        terms:
+          - total energy consumption
+          - total energy use
+          - energy consumed
+          - energy footprint
+          - gigajoules total
+          - energy gigajoules
+          - GJ consumed
+        units: ["GJ", "gigajoules", "MWh", "kWh"]
+        value_type: numeric
+        page_hint: 17
+
+      C017:
+        name: "Total GHG Emissions All Scopes"
+        terms:
+          - total GHG
+          - all scopes combined
+          - scope 1 2 3 total
+          - combined GHG
+          - total greenhouse gas
+          - combined emissions
+        units: ["tCO2e", "MtCO2e", "metric tons CO2e"]
+        value_type: numeric
+        page_hint: 23
+
+      C018:
+        name: "GHG Base Year Total (FY2015)"
+        terms:
+          - base year emissions
+          - baseline GHG
+          - FY2015 emissions
+          - FY15 baseline
+          - base year total
+          - 2015 baseline
+        units: ["tCO2e", "metric tons CO2e"]
+        value_type: numeric
+        page_hint: 23
+
+      C019:
+        name: "1.5°C Target Alignment"
+        terms:
+          - 1.5 degree
+          - 1.5C aligned
+          - Paris aligned
+          - well below 2 degrees
+          - SBTi 1.5
+          - net zero by 2050
+        value_type: boolean
+        page_hint: 5
+
+      C020:
+        name: "Emissions Target Achievement Status"
+        terms:
+          - target status
+          - achieved target
+          - scope 1 2 achieved
+          - in progress target
+          - target met
+          - on track
+          - scope 3 in progress
+        value_type: subjective
+        scoring_scale: "HIGH=achieved, MEDIUM=on track, LOW=behind"
+        page_hint: 12
+
+      C021:
+        name: "Scope 2 Emissions Location-Based"
+        terms:
+          - scope 2 location-based
+          - location based emissions
+          - scope 2 location
+          - grid electricity emissions
+          - location-based scope 2
+          - scope 2 lb
+        units: ["tCO2e", "metric tons CO2e"]
+        value_type: numeric
+        page_hint: 17
+
+      C022:
+        name: "Internal Carbon Price"
+        terms:
+          - internal carbon price
+          - shadow carbon price
+          - price on carbon
+          - carbon pricing internal
+          - carbon cost internal
+          - internal carbon cost
+        value_type: boolean
+        page_hint: 10
+
+  # ──────────────────────────────────────────────────────────
+  # BIODIVERSITY — 12 KPIs (F001-F011, P001)
+  # ──────────────────────────────────────────────────────────
+  biodiversity:
+    description: "Forests, deforestation, ecosystems, land use, biodiversity, sustainable commodities, animal welfare"
+
+    page_bucketing_keywords:
+      # Deforestation and forests
+      - deforestation
+      - forest
+      - forests
+      - deforestation free
+      - no deforestation
+      - DCF policy
+      - deforestation conversion free
+      - forest monitoring
+      - land conversion
+      - natural ecosystems
+      - forest stewardship
+      - FSC
+      - SFI certified
+      - PEFC certified
+      - sustainable forestry
+      - reforestation
+      # Biodiversity
+      - biodiversity
+      - habitat
+      - ecosystem
+      - land use
+      - TNFD
+      - nature-related
+      - species
+      - protected areas
+      - natural capital
+      - wetlands
+      - conservation
+      - soil
+      # Traceability and commodities
+      - traceability
+      - traceable
+      - leather traceability
+      - cattle traceability
+      - timber traceability
+      - sustainable sourcing
+      - raw materials
+      - deforestation risk commodity
+      # Agriculture
+      - sustainable agriculture
+      - regenerative agriculture
+      - cotton sustainability
+      - sustainable cotton
+      - Better Cotton
+      # Animal welfare
+      - animal welfare
+      - animal-derived materials
+      - leather standards
+      - wool standards
+      # Plastics
+      - plastics
+      - plastic waste
+      - plastic reduction
+      - recycled plastic
+
+    kpi_keywords:
+      F001:
+        name: "Deforestation Monitoring"
+        terms:
+          - deforestation monitoring
+          - deforestation estimated
+          - conversion monitoring
+          - natural ecosystem conversion tracked
+          - deforestation measurement
+        value_type: boolean
+        page_hint: 5
+
+      F002:
+        name: "No-Deforestation Policy Exists"
+        terms:
+          - no deforestation policy
+          - deforestation free policy
+          - DCF policy
+          - deforestation conversion free
+          - zero deforestation commitment
+          - forest policy document
+        value_type: boolean
+        page_hint: 5
+
+      F003:
+        name: "Deforestation Programme Active"
+        terms:
+          - deforestation programme
+          - deforestation implementation
+          - conversion free programme
+          - deforestation action
+          - forest protection programme
+          - traceability certification deforestation
+        value_type: boolean
+        page_hint: 5
+
+      F004:
+        name: "Landscape/Jurisdictional Initiatives"
+        terms:
+          - landscape initiative
+          - jurisdictional approach
+          - shared land use
+          - landscape programme
+          - jurisdictional deforestation
+          - collective forest action
+        value_type: boolean
+        page_hint: 5
+
+      F005:
+        name: "Sustainable Commodity Sourcing"
+        terms:
+          - sustainable commodities
+          - deforestation free sourcing
+          - sustainable raw materials
+          - commodity traceability
+          - forest-risk commodities
+          - certified sustainable sourcing
+          - raw materials standards
+        value_type: subjective
+        scoring_scale: "HIGH=formal policy+certified+monitored, MEDIUM=policy only, LOW=aspirational"
+        page_hint: 5
+
+      F006:
+        name: "Raw Material Traceability (Leather)"
+        terms:
+          - leather traceability
+          - cattle traceability
+          - raw material traceability
+          - material origin tracking
+          - leather origin
+          - traceable leather
+          - cattle sourcing traceability
+        value_type: boolean
+        page_hint: 5
+
+      F007:
+        name: "Timber/Fibre Traceability"
+        terms:
+          - timber traceability
+          - fibre traceability
+          - wood traceability
+          - forest material origin
+          - certified timber
+          - paper packaging certified
+        value_type: subjective
+        scoring_scale: "HIGH=full chain of custody, MEDIUM=certification-based, LOW=policy only"
+        page_hint: 5
+
+      F008:
+        name: "Forest Certifications (FSC/SFI/PEFC)"
+        terms:
+          - FSC certified
+          - SFI certified
+          - PEFC certified
+          - forest certification
+          - certified packaging
+          - certified fibre
+          - sustainable paper
+        value_type: boolean
+        page_hint: 6
+
+      F009:
+        name: "Sustainable Agriculture Programme"
+        terms:
+          - sustainable agriculture
+          - sustainable cotton
+          - regenerative agriculture
+          - Better Cotton Initiative
+          - BCI cotton
+          - sustainable farming
+          - agricultural sustainability
+        value_type: boolean
+        page_hint: 5
+
+      F010:
+        name: "Biodiversity Programme"
+        terms:
+          - biodiversity programme
+          - biodiversity initiative
+          - ecosystem programme
+          - nature programme
+          - biodiversity action plan
+          - ecosystem restoration
+          - nature-positive
+        value_type: boolean
+        page_hint: 5
+
+      F011:
+        name: "Animal Welfare Policy"
+        terms:
+          - animal welfare policy
+          - animal welfare standards
+          - animal-derived materials policy
+          - leather welfare
+          - animal welfare supply chain
+          - responsible animal sourcing
+        value_type: boolean
+        page_hint: 5
+
+      P001:
+        name: "Plastics Reduction Target"
+        terms:
+          - plastics target
+          - plastic reduction
+          - plastic waste target
+          - sustainable packaging plastic
+          - single use plastic
+          - plastic materials target
+          - recycled plastic target
+        value_type: subjective
+        scoring_scale: "HIGH=quantified reduction target, MEDIUM=indirect/materials target, LOW=aspirational"
+        page_hint: 5
+
+  # ──────────────────────────────────────────────────────────
+  # WASTE — 1 KPI (E001)
+  # ──────────────────────────────────────────────────────────
+  waste:
+    description: "Hazardous waste generation, waste management, waste diversion"
+
+    page_bucketing_keywords:
+      - hazardous waste
+      - waste generated
+      - waste management
+      - waste diversion
+      - landfill waste
+      - waste recycled
+      - solid waste
+      - manufacturing waste
+      - waste to landfill
+      - waste diverted
+      - GRI 306
+      - incineration
+      - waste metric tons
+
+    kpi_keywords:
+      E001:
+        name: "Hazardous Waste Generated (Manufacturing)"
+        terms:
+          - hazardous waste generated
+          - hazardous waste manufacturing
+          - hazardous waste production
+          - toxic waste generated
+          - hazardous materials disposed
+          - hazardous waste metric tons
+        units: ["MT", "metric tons", "tonnes", "t"]
+        value_type: numeric
+        page_hint: 29
+
+  # ──────────────────────────────────────────────────────────
+  # WATER — 16 KPIs (W001-W016)
+  # ──────────────────────────────────────────────────────────
+  water:
+    description: "Water withdrawal, recycling, intensity, ZDHC compliance, restoration, water-related targets"
+
+    page_bucketing_keywords:
+      # Volumes and withdrawal
+      - water withdrawal
+      - water consumption
+      - water use
+      - freshwater
+      - water intake
+      - total water
+      - water recycled
+      - water reused
+      - water reclaimed
+      - wastewater
+      - water discharge
+      - effluent
+      - megaliters
+      - ML water
+      # Intensity and targets
+      - freshwater intensity
+      - liters per kg
+      - water per kilogram
+      - water per kg
+      - 71.4
+      - 84.4
+      - water restoration
+      - water replenishment
+      - 13 billion liters
+      - 6.9 billion
+      # Supplier and programmes
+      - ZDHC
+      - zero discharge hazardous chemicals
+      - dyeing and finishing
+      - textile dyeing
+      - supplier water
+      - water stewardship
+      - water stressed
+      - water risk
+      - cleaner chemistry
+      # Policy and governance
+      - water management policy
+      - water target
+      - water reduction target
+      - water management programme
+      - water governance
+      - board oversight water
+      - GRI 303
+      - WASH
+      # Supply chain water
+      - strategic suppliers water
+      - manufacturing water
+      - water supply chain
+
+    kpi_keywords:
+      W001:
+        name: "Water Withdrawal Total"
+        terms:
+          - water withdrawal total
+          - total water withdrawal
+          - water consumed total
+          - total freshwater withdrawal
+          - water intake total
+          - water use total
+        units: ["ML", "megalitres", "megaliters", "m3", "cubic meters", "billion liters"]
+        value_type: numeric
+        page_hint: 30
+
+      W002:
+        name: "Water Recycled/Reused"
+        terms:
+          - water recycled
+          - water reused
+          - water recycling
+          - water reclaimed
+          - recycled water volume
+          - water circularity
+        units: ["ML", "megaliters", "m3", "%"]
+        value_type: numeric
+        page_hint: 30
+
+      W003:
+        name: "Wastewater ZDHC Supplier Compliance"
+        terms:
+          - ZDHC compliance
+          - ZDHC wastewater
+          - zero discharge hazardous chemicals
+          - wastewater guidelines compliance
+          - supplier wastewater compliance
+          - ZDHC strategic suppliers
+          - 90 percent ZDHC
+        units: ["%", "percent"]
+        value_type: numeric
+        page_hint: 45
+
+      W004:
+        name: "Operations in Water-Stressed Areas"
+        terms:
+          - water stressed operations
+          - water scarce regions
+          - water risk operations
+          - high water stress
+          - operations water stress
+          - water stressed facilities
+        units: ["%", "percent", "count"]
+        value_type: numeric
+        page_hint: 30
+
+      W005:
+        name: "Board-Level Environmental Oversight"
+        terms:
+          - board oversight environmental
+          - board environmental oversight
+          - board-level oversight
+          - CRS&G committee
+          - corporate responsibility sustainability governance
+          - board ESG oversight
+          - environmental governance board
+          - GRI 2-12
+        value_type: boolean
+        page_hint: 3
+
+      W006:
+        name: "Water Restoration Target"
+        terms:
+          - water restoration target
+          - water replenishment target
+          - 13 billion liters
+          - restore water
+          - water resilience target
+          - water stressed ecosystems
+        value_type: boolean
+        page_hint: 6
+
+      W007:
+        name: "Cleaner Chemistry / ZDHC Target"
+        terms:
+          - cleaner chemistry
+          - ZDHC target
+          - priority chemistries
+          - hazardous chemicals target
+          - clean chemistry supply chain
+          - chemical management target
+          - 10 priority chemistries
+        value_type: boolean
+        page_hint: 3
+
+      W008:
+        name: "WASH Target"
+        terms:
+          - WASH target
+          - water sanitation hygiene
+          - WASH programme
+          - water access sanitation
+          - employee WASH
+        value_type: boolean
+        page_hint: 6
+
+      W009:
+        name: "Freshwater Reduction Target"
+        terms:
+          - freshwater reduction target
+          - water intensity target
+          - water per kg target
+          - 25 percent reduction
+          - freshwater use reduction
+          - water efficiency target
+          - dyeing finishing water target
+        value_type: boolean
+        page_hint: 4
+
+      W010:
+        name: "Water Target Progress vs Goal"
+        terms:
+          - water target progress
+          - freshwater reduction achieved
+          - 15 percent reduction
+          - water stewardship progress
+          - 60 percent of target
+          - water performance
+          - water target status
+        value_type: subjective
+        scoring_scale: "HIGH=>60% target met+additional actions, MEDIUM=30-60%, LOW=<30%"
+        page_hint: 45
+
+      W011:
+        name: "Freshwater Intensity (FY24 Reported)"
+        terms:
+          - 71.4
+          - freshwater intensity
+          - liters per kg
+          - L per kg
+          - freshwater use per kg
+          - water intensity dyeing
+          - textile dyeing intensity
+        units: ["L/kg", "liters per kg", "litres per kg"]
+        value_type: numeric
+        page_hint: 6
+        note: "Reported directly as 71.4 L/kg in FY24 reporting year figure"
+
+      W012:
+        name: "Freshwater Intensity Base Year (FY20)"
+        terms:
+          - 84.4
+          - FY20 freshwater
+          - base year freshwater
+          - FY2020 water baseline
+          - 84.4 L per kg
+          - water baseline
+        units: ["L/kg", "liters per kg"]
+        value_type: numeric
+        page_hint: 6
+
+      W013:
+        name: "Water Restoration Base Year (FY20)"
+        terms:
+          - 0.7 billion liters
+          - water restoration baseline
+          - FY20 water restored
+          - base year restored
+          - 0.7B liters
+        units: ["billion liters", "B liters", "liters"]
+        value_type: numeric
+        page_hint: 6
+
+      W014:
+        name: "Water Restored FY24"
+        terms:
+          - 6.9 billion liters
+          - water restored
+          - water replenished
+          - 6.9B liters
+          - liters restored
+          - water restoration achieved
+          - 53 percent restoration
+        units: ["billion liters", "B liters", "B L"]
+        value_type: numeric
+        page_hint: 6
+        note: "6.9B = cumulative total. 6.2B = incremental above FY20 base. Both are valid."
+
+      W015:
+        name: "Water Target Supplier Coverage"
+        terms:
+          - 80 percent suppliers
+          - water target coverage
+          - supplier water scope
+          - textile supplier coverage
+          - dyeing finishing coverage
+          - 80 percent footwear
+        units: ["%", "percent"]
+        value_type: numeric
+        page_hint: 6
+
+      W016:
+        name: "Water Management Policy"
+        terms:
+          - water management policy
+          - water policy
+          - water stewardship policy
+          - water governance policy
+          - water use policy
+          - water management programme policy
+        value_type: boolean
+        page_hint: 38
+
+  # ──────────────────────────────────────────────────────────
+  # EMPLOYEE / SOCIAL — 18 KPIs (S001-S018)
+  # ──────────────────────────────────────────────────────────
+  employee:
+    description: "Workforce, health & safety, diversity, training, human rights, supply chain labor, community"
+
+    page_bucketing_keywords:
+      # Workforce size and composition
+      - total employees
+      - workforce
+      - headcount
+      - full-time employees
+      - part-time employees
+      - global employees
+      - number of employees
+      - FTE
+      - employee count
+      # Gender and diversity
+      - women employees
+      - female employees
+      - gender diversity
+      - women workforce
+      - gender ratio
+      - women in leadership
+      - female leadership
+      - women managers
+      - women directors
+      - DEI
+      - diversity equity inclusion
+      - inclusion programme
+      - belonging
+      - racial equity
+      # Safety
+      - fatalities
+      - work-related deaths
+      - fatal injuries
+      - occupational fatalities
+      - lost time injury
+      - LTIR
+      - TRIR
+      - total recordable
+      - recordable incidents
+      - injury rate
+      - safety incidents
+      - occupational health
+      - safety performance
+      - lost time
+      - health and safety
+      # Training and development
+      - training hours
+      - learning hours
+      - employee development
+      - training per employee
+      - learning per person
+      # Turnover and retention
+      - employee turnover
+      - attrition
+      - voluntary turnover
+      - retention rate
+      - separations
+      # Pay and compensation
+      - CEO pay ratio
+      - pay ratio
+      - median employee
+      - pay equity
+      - gender pay gap
+      - equal pay
+      - wage gap
+      - living wage
+      # Community
+      - community investment
+      - social investment
+      - philanthropic
+      - Nike Foundation
+      - charitable contributions
+      # Human rights and supply chain
+      - human rights
+      - forced labor
+      - child labor
+      - modern slavery
+      - supply chain audits
+      - factory audits
+      - supplier audits
+      - manufacturing audit
+      - supplier code of conduct
+      - manufacturing code
+      - labor standards suppliers
+      - collective bargaining
+      - union coverage
+      - labor relations
+      - labour relations
+      # Employee engagement
+      - employee engagement
+      - employee satisfaction
+      - engagement survey
+      - pulse survey
+      # GRI references
+      - GRI 401
+      - GRI 403
+      - GRI 404
+      - GRI 405
+      - GRI 408
+      - GRI 413
+      - GRI 414
+      # SASB references
+      - CG-AA-310
+      - CG-AA-430
+
+    kpi_keywords:
+      S001:
+        name: "Total Workforce"
+        terms:
+          - total employees
+          - total workforce
+          - headcount
+          - number of employees
+          - global employees
+          - FTE total
+          - total workers
+          - workforce size
+          - employee count
+        units: ["count", "number", "FTE"]
+        value_type: numeric
+        page_hint: 35
+
+      S002:
+        name: "Female Workforce Percentage"
+        terms:
+          - women employees percent
+          - female employees percent
+          - women workforce
+          - gender diversity workforce
+          - female representation workforce
+          - percent women
+          - gender ratio workforce
+          - women workers percent
+        units: ["%", "percent"]
+        value_type: numeric
+        page_hint: 36
+
+      S003:
+        name: "Employee Fatalities (Owned/Operated)"
+        terms:
+          - fatalities owned operated
+          - work-related deaths facilities
+          - fatal injuries owned
+          - occupational fatalities direct
+          - employee deaths owned
+          - fatal accidents facilities
+          - worker fatality owned
+        units: ["count", "number"]
+        value_type: numeric
+        page_hint: 37
+        note: "Distinguish from supplier fatalities (S012). Zero is the positive result."
+
+      S004:
+        name: "Lost Time Incident Rate (LTIR)"
+        terms:
+          - LTIR
+          - lost time incident rate
+          - lost time injury rate
+          - lost time frequency rate
+          - LTIFR
+          - lost day injury
+          - lost time rate
+        units: ["rate per 200,000 hrs", "per 200k hrs"]
+        value_type: numeric
+        page_hint: 37
+
+      S005:
+        name: "Training Hours per Employee"
+        terms:
+          - training hours per employee
+          - learning hours per person
+          - average training hours
+          - hours per employee training
+          - employee development hours
+          - training per person
+          - learning hours average
+        units: ["hours", "hrs"]
+        value_type: numeric
+        page_hint: 38
+
+      S006:
+        name: "Employee Turnover Rate"
+        terms:
+          - employee turnover
+          - turnover rate
+          - attrition rate
+          - voluntary turnover
+          - staff turnover
+          - employee separations percent
+          - workforce turnover
+        units: ["%", "percent"]
+        value_type: numeric
+        page_hint: 36
+
+      S007:
+        name: "Community Investment"
+        terms:
+          - community investment
+          - social investment
+          - philanthropic contribution
+          - Nike Foundation
+          - charitable grants
+          - community giving
+          - social contribution
+          - foundation grants
+        units: ["USD millions", "$ million", "USD", "million dollars"]
+        value_type: numeric
+        page_hint: 39
+
+      S008:
+        name: "Human Rights Policy"
+        terms:
+          - human rights policy
+          - human rights commitment
+          - forced labor policy
+          - child labor policy
+          - modern slavery statement
+          - human trafficking policy
+          - human rights due diligence
+          - human rights standards
+        value_type: boolean
+        page_hint: 38
+
+      S009:
+        name: "Supply Chain Factory Audits"
+        terms:
+          - factory audits
+          - supplier audits
+          - manufacturing audits
+          - supplier assessments
+          - factory inspections
+          - supply chain audits conducted
+          - facilities audited
+          - number of audits
+        units: ["count", "number", "factories"]
+        value_type: numeric
+        page_hint: 39
+
+      S010:
+        name: "Women in Leadership"
+        terms:
+          - women in leadership
+          - female leadership percent
+          - women directors percent
+          - women managers
+          - female management
+          - gender leadership
+          - women director level
+          - women above director
+        units: ["%", "percent"]
+        value_type: numeric
+        page_hint: 36
+
+      S011:
+        name: "Total Recordable Incident Rate (TRIR)"
+        terms:
+          - TRIR
+          - total recordable incident rate
+          - recordable incident rate
+          - total recordable rate
+          - recordable injuries rate
+          - total recordable frequency
+          - safety recordable rate
+        units: ["rate per 200,000 hrs", "per 200k hrs"]
+        value_type: numeric
+        page_hint: 37
+
+      S012:
+        name: "Supplier Worker Fatalities"
+        terms:
+          - supplier fatalities
+          - factory worker deaths
+          - supply chain fatalities
+          - contract worker deaths
+          - manufacturing worker fatalities
+          - tier 1 fatalities
+          - supplier worker deaths
+        units: ["count", "number"]
+        value_type: numeric
+        page_hint: 39
+        note: "Supply chain fatalities — distinguish from owned/operated (S003)"
+
+      S013:
+        name: "CEO Pay Ratio"
+        terms:
+          - CEO pay ratio
+          - executive pay ratio
+          - median employee pay ratio
+          - CEO to worker ratio
+          - CEO compensation ratio
+          - pay ratio disclosure
+          - CEO vs median
+        units: ["ratio", "x", "times"]
+        value_type: numeric
+        page_hint: 40
+
+      S014:
+        name: "Supplier Code of Conduct"
+        terms:
+          - supplier code of conduct
+          - manufacturing code of conduct
+          - vendor code
+          - factory standards document
+          - supplier labor standards
+          - code for suppliers
+          - manufacturing standards code
+        value_type: boolean
+        page_hint: 38
+
+      S015:
+        name: "DEI Programme"
+        terms:
+          - diversity equity inclusion programme
+          - DEI programme
+          - DEI commitment
+          - inclusion programme
+          - diversity strategy
+          - belonging programme
+          - racial equity commitment
+          - inclusive workplace programme
+        value_type: boolean
+        page_hint: 36
+
+      S016:
+        name: "Pay Equity Programme"
+        terms:
+          - pay equity
+          - gender pay gap analysis
+          - equal pay programme
+          - pay parity commitment
+          - fair pay analysis
+          - gender wage gap
+          - equal remuneration analysis
+          - pay equity audit
+        value_type: boolean
+        page_hint: 36
+
+      S017:
+        name: "Employee Engagement Monitoring"
+        terms:
+          - employee engagement survey
+          - employee satisfaction survey
+          - engagement monitoring
+          - pulse survey
+          - employee feedback programme
+          - engagement score
+          - employee sentiment
+        value_type: boolean
+        page_hint: 36
+
+      S018:
+        name: "Collective Labour Agreement Coverage"
+        terms:
+          - collective bargaining
+          - union coverage
+          - collective labour agreement
+          - collective agreement percent
+          - unionized workforce
+          - works council
+          - trade union recognition
+          - labor agreement coverage
+        units: ["%", "percent"]
+        value_type: numeric
+        page_hint: 38
+
+  # ──────────────────────────────────────────────────────────
+  # GOVERNANCE — 19 KPIs (G001-G017, CONT001-CONT002)
+  # ──────────────────────────────────────────────────────────
+  governance:
+    description: "Board structure, executive pay, ethics, compliance, data privacy, controversy"
+
+    page_bucketing_keywords:
+      # Board composition
+      - board independence
+      - independent directors
+      - non-executive directors
+      - board composition
+      - board members
+      - directors
+      - board size
+      - board seats
+      # Board diversity
+      - women on board
+      - female directors
+      - board gender
+      - board diversity
+      # Leadership structure
+      - CEO chair
+      - chairman CEO
+      - independent chair
+      - lead independent director
+      - CEO separation
+      - executive chairman
+      # Board tenure
+      - board tenure
+      - average tenure
+      - director tenure
+      - years on board
+      - board refreshment
+      # ESG governance
+      - ESG committee
+      - sustainability committee
+      - CRS&G committee
+      - corporate responsibility committee
+      - board oversight ESG
+      - board ESG oversight
+      - environmental oversight board
+      # Executive compensation
+      - ESG linked pay
+      - sustainability linked compensation
+      - executive remuneration
+      - CEO pay
+      - executive compensation
+      - TSR
+      - performance shares
+      # Compliance and ethics
+      - environmental fines
+      - regulatory penalties
+      - ESG violations
+      - compliance incidents
+      - anti-corruption
+      - bribery
+      - code of conduct
+      - whistleblower
+      - ethics hotline
+      - speak up
+      - reporting channel
+      - ethics violations
+      - conflicts of interest
+      - insider trading
+      # Data privacy
+      - data privacy
+      - cybersecurity
+      - data protection
+      - information security
+      - GDPR
+      - data breach
+      # Assurance and disclosure
+      - third party assurance
+      - external assurance
+      - independent verification
+      - ESG data assurance
+      - audit committee
+      - CEO remuneration disclosed
+      # Controversy
+      - controversy
+      - ESG controversy
+      - greenwashing
+      - supply chain controversy
+      - environmental controversy
+      - social controversy
+      # Human rights governance
+      - human rights board
+      - board human rights
+      - human rights responsibility
+      # Framework references
+      - GRI 2-9
+      - GRI 2-12
+      - GRI 2-15
+      - GRI 2-19
+      - GRI 2-26
+      - GRI 2-27
+      - GRI 205
+      - GRI 418
+      - proxy statement
+      - annual report governance
+
+    kpi_keywords:
+      G001:
+        name: "Board Independence"
+        terms:
+          - board independence
+          - independent directors percent
+          - non-executive directors percent
+          - independent board members
+          - board composition independent
+          - percent independent
+          - 9 out of 12
+          - 75 percent independent
+        units: ["%", "percent", "ratio"]
+        value_type: numeric
+        page_hint: 3
+
+      G002:
+        name: "Board Gender Diversity"
+        terms:
+          - women on board
+          - female directors percent
+          - board gender diversity
+          - women board members
+          - board gender
+          - percent women directors
+          - female board representation
+          - 42 percent women board
+        units: ["%", "percent"]
+        value_type: numeric
+        page_hint: 3
+
+      G003:
+        name: "CEO/Chair Separation"
+        terms:
+          - CEO chair separation
+          - chairman CEO separate
+          - independent chair
+          - combined CEO chairman
+          - CEO not chairman
+          - executive chairman
+          - lead independent director
+          - separate CEO chair roles
+        value_type: boolean
+        page_hint: 3
+
+      G004:
+        name: "ESG Board Committee"
+        terms:
+          - ESG committee
+          - sustainability committee
+          - CRS&G committee
+          - corporate responsibility sustainability governance
+          - board ESG committee
+          - ESG oversight committee
+          - board sustainability committee
+        value_type: boolean
+        page_hint: 3
+
+      G005:
+        name: "ESG-Linked Executive Pay"
+        terms:
+          - ESG linked pay
+          - sustainability linked compensation
+          - ESG executive compensation
+          - executive pay ESG metric
+          - performance shares ESG
+          - incentive ESG
+          - ESG bonus
+          - ESG remuneration
+        value_type: boolean
+        page_hint: 4
+
+      G006:
+        name: "ESG Regulatory Fines"
+        terms:
+          - environmental fines
+          - regulatory penalties
+          - ESG fines
+          - environmental violations fines
+          - legal sanctions environmental
+          - government fines
+          - compliance penalties
+          - regulatory enforcement
+        units: ["USD", "$", "USD millions"]
+        value_type: numeric
+        page_hint: 40
+        note: "Zero is the positive result for this metric"
+
+      G007:
+        name: "Anti-Corruption Policy"
+        terms:
+          - anti-corruption policy
+          - bribery policy
+          - anti-bribery programme
+          - corruption prevention
+          - FCPA compliance
+          - anti-bribery commitment
+          - corruption policy
+          - bribery corruption policy
+        value_type: boolean
+        page_hint: 38
+
+      G008:
+        name: "Third-Party ESG Data Assurance"
+        terms:
+          - third party assurance
+          - external assurance ESG
+          - independent verification ESG
+          - ESG data verified
+          - assurance provider
+          - external audit ESG
+          - assurance statement
+          - limited assurance
+        value_type: boolean
+        page_hint: 41
+
+      G009:
+        name: "Environmental Policy"
+        terms:
+          - environmental policy
+          - sustainability policy
+          - environmental commitment document
+          - environmental management policy
+          - environmental responsibility statement
+          - sustainability commitments policy
+        value_type: boolean
+        page_hint: 5
+
+      G010:
+        name: "Board Size"
+        terms:
+          - board size
+          - number of directors
+          - total board members
+          - board seats
+          - directors on board
+          - board composition size
+          - 12 directors
+        units: ["count", "number"]
+        value_type: numeric
+        page_hint: 3
+
+      G011:
+        name: "Data Privacy / Cybersecurity Policy"
+        terms:
+          - data privacy policy
+          - cybersecurity policy
+          - data protection policy
+          - information security policy
+          - privacy programme
+          - GDPR compliance
+          - data governance policy
+          - consumer data privacy
+        value_type: boolean
+        page_hint: 38
+
+      G012:
+        name: "Ethics Hotline / Whistleblower Channel"
+        terms:
+          - ethics hotline
+          - whistleblower channel
+          - speak up channel
+          - ethics reporting channel
+          - misconduct reporting
+          - whistleblower protection
+          - anonymous reporting
+          - ethics report line
+        value_type: boolean
+        page_hint: 38
+
+      G013:
+        name: "Executive Remuneration Disclosure"
+        terms:
+          - CEO pay disclosed
+          - executive remuneration disclosed
+          - executive compensation annual report
+          - CEO salary disclosure
+          - top executive pay
+          - remuneration report
+          - proxy statement pay
+        value_type: boolean
+        page_hint: 40
+
+      G014:
+        name: "Average Board Tenure"
+        terms:
+          - average board tenure
+          - average director tenure
+          - board service years
+          - years on board average
+          - director term average
+          - board refreshment tenure
+          - tenure of directors
+        units: ["years", "yrs"]
+        value_type: numeric
+        page_hint: 3
+
+      G015:
+        name: "Conflicts of Interest Policy"
+        terms:
+          - conflicts of interest policy
+          - conflict of interest
+          - related party transactions policy
+          - board independence conflict
+          - director conflict policy
+          - conflict management policy
+          - interest disclosure policy
+        value_type: boolean
+        page_hint: 38
+
+      G016:
+        name: "Insider Trading Policy"
+        terms:
+          - insider trading policy
+          - share dealing policy
+          - securities trading policy
+          - blackout periods
+          - trading restrictions employees
+          - insider dealing policy
+          - share trading rules
+        value_type: boolean
+        page_hint: 38
+
+      G017:
+        name: "Human Rights Responsibility at Board Level"
+        terms:
+          - human rights board responsibility
+          - board human rights oversight
+          - board human rights accountability
+          - human rights governance
+          - human rights board level
+          - board social responsibility
+          - CRS&G human rights
+        value_type: boolean
+        page_hint: 3
+
+      CONT001:
+        name: "Environmental Controversy Score (Supply Chain)"
+        terms:
+          - supply chain environmental controversy
+          - environmental controversy
+          - pollution controversy
+          - supply chain pollution
+          - toxic water controversy
+          - environmental incident supply chain
+          - ecosystem damage controversy
+          - chemical pollution suppliers
+          - textile pollution controversy
+        value_type: subjective
+        scoring_scale: "NONE=0pts, MILD=-3pts, MODERATE=-8pts, SEVERE=-15pts"
+        page_hint: web_search_required
+        note: "Apply scoring deduction to overall ESG score. Nike FY24 = MODERATE (-8 pts)"
+
+      CONT002:
+        name: "Environmental Controversy Score (Products)"
+        terms:
+          - greenwashing controversy
+          - product environmental controversy
+          - marketing controversy
+          - environmental product claim
+          - Move to Zero controversy
+          - sustainability claim controversy
+          - green marketing controversy
+        value_type: subjective
+        scoring_scale: "NONE=0pts, MILD=-3pts, MODERATE=-5pts, SEVERE=-12pts"
+        page_hint: web_search_required
+        note: "Apply scoring deduction to overall ESG score. Nike FY24 = MODERATE (-5 pts)"
