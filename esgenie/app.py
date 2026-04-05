@@ -3,6 +3,7 @@ app.py
 ESGenie — Streamlit UI. Three tabs: Analyst Workbench / Configuration / Watchtower.
 """
 
+
 import json
 import os
 import re
@@ -33,6 +34,24 @@ from scoring.esg_scorer import score_company, CONTROVERSY_DEDUCTIONS
 from evaluation.eval_runner import run_eval_heuristic, build_eval_csv, has_ground_truth
 from logging_system.ai_metrics_logger import log_heuristic_eval
 from utils.token_tracker import get_session_summary, reset_session
+
+
+st.markdown("""
+<style>
+/* Reduce metric value font */
+[data-testid="stMetricValue"] {
+    font-size: 18px !important; 
+}
+/* Reduce metric label font */
+[data-testid="stMetricLabel"] {
+    font-size: 13px !important; 
+}
+/* Optional: Reduce spacing */
+[data-testid="stMetric"] {
+    padding: 8px 0px !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
 # Auto-detection helpers — no LLM calls
@@ -555,7 +574,7 @@ with tab1:
                     intensity_v, intensity_u = format_metric_value(get_extraction_value(extractions, "W011"), "L/kg")
                     zdhc_v,      zdhc_u      = format_metric_value(get_extraction_value(extractions, "W003"), "%")
                     waste_v,     waste_u     = format_metric_value(get_extraction_value(extractions, "E001"), "MT")
-                    restored_v,  restored_u  = format_metric_value(get_extraction_value(extractions, "W014"), "B liters")
+                    restored_v,  restored_u  = format_metric_value(get_extraction_value(extractions, "W014"), "L")
 
                     _wr1, _wr2 = st.columns(2)
                     _wr3, _wr4 = st.columns(2)
