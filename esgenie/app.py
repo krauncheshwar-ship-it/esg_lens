@@ -4,20 +4,30 @@ ESGenie — Streamlit UI. Three tabs: Analyst Workbench / Configuration / Watcht
 """
 
 
-import json
-import os
-import re
 import sys
+import os
+from pathlib import Path
+
+# Add the esgenie directory to Python path
+_root = Path(__file__).parent
+if str(_root) not in sys.path:
+    sys.path.insert(0, str(_root))
+
+# Also add parent in case imports are relative to repo root
+_parent = _root.parent
+if str(_parent) not in sys.path:
+    sys.path.insert(0, str(_parent))
+
+import json
+import re
 import tempfile
 from collections import Counter
-from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 import yaml
 from dotenv import load_dotenv
 
-sys.path.insert(0, str(Path(__file__).parent))
 load_dotenv(Path(__file__).parent / ".env")
 
 from ingestion.pdf_parser import extract_pages
